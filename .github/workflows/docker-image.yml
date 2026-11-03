@@ -2,17 +2,20 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+      - uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t my-app .
+
+      - name: Run application
+        run: |
+          docker run -d -p 8080:8080 --name my-app my-app
+          sleep 30
+          docker logs my-app
