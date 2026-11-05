@@ -5,6 +5,7 @@ import { UserModule } from './resources/user/user.module';
 import { AuthModule } from './resources/auth/auth.module';
 import { JsonwebtokenModule } from './resources/jsonwebtoken/jsonwebtoken.module';
 import { BrandModule } from './resources/brand/brand.module';
+import { CategoryModule } from './resources/category/category.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { BrandModule } from './resources/brand/brand.module';
     AuthModule,
     JsonwebtokenModule,
     BrandModule,
+    CategoryModule,
 
   ],
   controllers: [],

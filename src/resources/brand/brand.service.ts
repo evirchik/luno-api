@@ -1,6 +1,7 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateBrandDto } from './dto/create-brand';
+import { UpdateBrandDto } from './dto/update-brand';
 
 @Injectable()
 export class BrandService {
@@ -32,7 +33,11 @@ export class BrandService {
     });
   }
 
-  async update(id: string, updateBrandDto: Partial<CreateBrandDto>) {
+  async update(id: string, updateBrandDto: UpdateBrandDto) {
+    const findBrand = await this.findById(id);
+    if (!findBrand) {
+      throw new ConflictException('Такого бренда не существует');
+    }
     return await this.prisma.brand.update({
       where: { id },
       data: updateBrandDto,
@@ -40,6 +45,10 @@ export class BrandService {
   }
 
   async delete(id: string) {
+    const findBrand = await this.findById(id);
+    if (!findBrand) {
+      throw new ConflictException('Такого бренда не существует');
+    }
     return await this.prisma.brand.delete({
       where: { id },
     });
