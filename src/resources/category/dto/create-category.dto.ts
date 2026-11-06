@@ -11,3 +11,4 @@ export class CreateCategoryDto {
   @Transform(({ value }: { value: string }) => value.toLowerCase())
   name: string;
 }
+
