@@ -6,10 +6,12 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import { BrandService } from './brand.service';
-import { CreateBrandDto } from './dto/create-brand';
+import { CreateBrandDto } from './dto/create-brand.dto';
 import { UpdateBrandDto } from './dto/update-brand';
+import { QueryBrandDto } from './dto/query-brand.dto';
 
 @Controller('brand')
 export class BrandController {
@@ -28,6 +30,11 @@ export class BrandController {
   @Get('by-name/:name')
   async findBrandByName(@Param('name') name: string) {
     return await this.brandService.findByName(name);
+  }
+
+  @Get('search')
+  async searchBrand(@Query() queryBrandDto: QueryBrandDto) {
+    return await this.brandService.search(queryBrandDto.search);
   }
 
   @Post('create')

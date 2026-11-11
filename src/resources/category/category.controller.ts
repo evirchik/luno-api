@@ -1,7 +1,17 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+import { QueryCategoryDto } from './dto/query-category.dto';
 
 @Controller('category')
 export class CategoryController {
@@ -20,6 +30,11 @@ export class CategoryController {
   @Get('by-name/:name')
   async findCategoryByName(@Param('name') name: string) {
     return await this.categoryService.findByName(name);
+  }
+
+  @Get('search')
+  async searchCategory(@Query() queryCategoryDto: QueryCategoryDto) {
+    return await this.categoryService.search(queryCategoryDto.search);
   }
 
   @Post('create')

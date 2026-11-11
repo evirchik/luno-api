@@ -10,7 +10,11 @@ import { ProductModule } from './resources/product/product.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env' }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+      expandVariables: true,
+    }),
     PrismaModule,
     UserModule,
     AuthModule,
@@ -18,7 +22,6 @@ import { ProductModule } from './resources/product/product.module';
     BrandModule,
     CategoryModule,
     ProductModule,
-
   ],
   controllers: [],
   providers: [],

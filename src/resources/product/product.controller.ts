@@ -2,24 +2,32 @@ import {
   Body,
   Controller,
   Delete,
+  FileTypeValidator,
   Get,
+  MaxFileSizeValidator,
   Param,
+  ParseFilePipe,
   Patch,
   Post,
   Query,
+  UploadedFile,
+  UploadedFiles,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { QueryProductDto } from './dto/query-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { FilterProductDto } from './dto/filter-product.dto';
+import { ApiBody, ApiConsumes } from '@nestjs/swagger';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { UploadProductImageDto } from './dto/image-product.dto';
 
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
-  @Get('all')
-  getAllProducts(@Query() queryProductDto: QueryProductDto) {
+  @Post('all')
+  getAllProducts(@Body() queryProductDto: QueryProductDto) {
     return this.productService.findAll(queryProductDto);
   }
 
@@ -53,12 +61,35 @@ export class ProductController {
   }
 
   @Post('create')
-  async createProduct(@Body() createProductDto: CreateProductDto) {
+  createProduct(@Body() createProductDto: CreateProductDto) {
     return this.productService.create(createProductDto);
   }
 
+  @Post('create/image')
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Изображения товара',
+    type: UploadProductImageDto,
+  })
+  @UseInterceptors(FilesInterceptor('files', 10))
+  createImageProduct(
+    @UploadedFiles(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 5 * 1024 * 1024 }),
+          new FileTypeValidator({
+            fileType: /^image\/(png|jpeg|jpg|webp)$/,
+          }),
+        ],
+      }),
+    )
+    files: Express.Multer.File[],
+  ) {
+    return this.productService.createImage(files);
+  }
+
   @Patch('update/:id')
-  async updateProduct(
+  updateProduct(
     @Param('id') id: string,
     @Body() updateProductDto: UpdateProductDto,
   ) {

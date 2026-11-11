@@ -23,6 +23,13 @@ export class CategoryService {
     });
   }
 
+  async search(value: string) {
+    return await this.prisma.category.findMany({
+      orderBy: { createdAt: 'desc' },
+      where: { name: { contains: value, mode: 'insensitive' } },
+    });
+  }
+
   async create(createCategoryDto: CreateCategoryDto) {
     const findCategory = await this.findByName(createCategoryDto.name);
     if (findCategory) {

@@ -1,6 +1,6 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateBrandDto } from './dto/create-brand';
+import { CreateBrandDto } from './dto/create-brand.dto';
 import { UpdateBrandDto } from './dto/update-brand';
 
 @Injectable()
@@ -20,6 +20,13 @@ export class BrandService {
   async findByName(name: string) {
     return await this.prisma.brand.findUnique({
       where: { name },
+    });
+  }
+
+  async search(value: string) {
+    return await this.prisma.brand.findMany({
+      orderBy: { createdAt: 'desc' },
+      where: { name: { contains: value, mode: 'insensitive' } },
     });
   }
 

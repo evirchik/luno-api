@@ -1,6 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
-import { IsArray, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import {
+  IsArray,
+  IsInt,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Min,
+} from 'class-validator';
 
 export class QueryProductDto {
   @ApiProperty({
@@ -40,20 +48,22 @@ export class QueryProductDto {
   @ApiProperty({
     description: 'Категория',
     required: false,
-    example: 'Кроссовки',
+    example: ['Кроссовки'],
   })
   @IsOptional()
-  @IsString({ message: 'Категория должен быть строкой' })
-  category?: string;
+  @IsArray({ message: 'Категории должены быть переданы в виде массива' })
+  @IsString({ each: true, message: 'Каждая категория должена быть строкой' })
+  category?: string[];
 
   @ApiProperty({
     description: 'Бренд',
     required: false,
-    example: 'Nike',
+    example: ['Nike'],
   })
   @IsOptional()
-  @IsString({ message: 'Бренд должен быть строкой' })
-  brand?: string;
+  @IsArray({ message: 'Бренды должены быть переданы в виде массива' })
+  @IsString({ each: true, message: 'Каждый бренд должен быть строкой' })
+  brand?: string[];
 
   @ApiProperty({
     description: 'Массив размеров для фильтрации',

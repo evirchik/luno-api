@@ -10,9 +10,11 @@ import { BrandService } from '../brand/brand.service';
 import { CategoryService } from '../category/category.service';
 import { generateSku } from '../../utils/sku.generated';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { FilterProductDto } from './dto/filter-product.dto';
+import * as fs from 'fs';
 import { QueryProductDto } from './dto/query-product.dto';
 import { Prisma } from '../../generated/prisma/client';
+import path from 'path';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class ProductService {
@@ -63,6 +65,33 @@ export class ProductService {
     });
   }
 
+  async createImage(files: Express.Multer.File[]) {
+    const uploadPath = path.join(
+      process.cwd(),
+      'uploads',
+      'images',
+      'products',
+    );
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
+    }
+    const savedFiles = [];
+    for (const file of files) {
+      const extension = path.extname(file.originalname);
+      const filename = `${randomUUID()}${extension}`;
+
+      const filePath = path.join(uploadPath, filename);
+
+      fs.writeFileSync(filePath, file.buffer);
+
+      savedFiles.push({
+        filename,
+        path: `${process.env.SERVER_URLа}/uploads/images/products/${filename}`,
+      });
+    }
+    return savedFiles;
+  }
+
   async update(id: string, updateProductDto: UpdateProductDto) {
     const findProduct = await this.findById(id);
     if (!findProduct) {
@@ -103,12 +132,12 @@ export class ProductService {
     }
     if (category) {
       options.category = {
-        name: { contains: category, mode: 'insensitive' },
+        name: { in: category, mode: 'insensitive' },
       };
     }
     if (brand) {
       options.brand = {
-        name: { contains: brand, mode: 'insensitive' },
+        name: { in: brand, mode: 'insensitive' },
       };
     }
 
@@ -116,7 +145,7 @@ export class ProductService {
       options.productVariants = {
         some: {
           size: { in: sizes },
-          quantity: { gt: 0 }, // Показываем только то, что есть в наличии
+          quantity: { gt: 0 },
           isActive: true,
         },
       };
